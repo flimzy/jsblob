@@ -6,12 +6,8 @@ Read more about JavaScript Blobs here: https://developer.mozilla.org/en-US/docs/
 package jsblob
 
 import (
-	"bytes"
-// 	"fmt"
-// 	"io"
 	"sync"
 	"github.com/gopherjs/gopherjs/js"
-// 	"github.com/gopherjs/jsbuiltin"
 )
 
 type Blob struct {
@@ -73,9 +69,4 @@ func (b *Blob) Bytes() []byte {
 	fileReader.Call("readAsArrayBuffer", b.o)
 	wg.Wait()
 	return buf
-}
-
-// NewReader returns a bytes.Reader
-func (b *Blob) NewReader() *bytes.Reader {
-	return bytes.NewReader( b.Bytes() )
 }
