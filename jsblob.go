@@ -2,6 +2,12 @@
 Package jsblob provides GopherJS bindings for the JavaScript Blob objects.
 
 Read more about JavaScript Blobs here: https://developer.mozilla.org/en-US/docs/Web/API/Blob
+
+A js.Object containing an existing Blob can be cast to a Blob object as follows:
+
+    nativeBlob := js.Global.Get("Blob").New([]string{"some blobby data"})
+    blob := jsblob.Blob{*nativeBlob}
+    fmt.Println( blob.Size() ) // 16
  */
 package jsblob
 
@@ -10,8 +16,9 @@ import (
 	"github.com/gopherjs/gopherjs/js"
 )
 
+// Blob wraps a js.Object
 type Blob struct {
-	o      *js.Object
+	js.Object
 }
 
 type Options struct {
@@ -23,36 +30,36 @@ type Options struct {
 // concatenation of the array of values given in parameter.
 func New(parts []interface{}, opts Options) *Blob {
 	blob := js.Global.Get("Blob").New(parts, opts)
-	return &Blob{blob}
+	return &Blob{*blob}
 }
 
 // IsClosed returns true if the Close() method (or the underlying JavaScript
 // Blobl.close() method) has been called on the blob. Closed blobs can not be
 // read.
 func (b *Blob) IsClosed() bool {
-	return b.o.Get("isClosed").Bool()
+	return b.Get("isClosed").Bool()
 }
 
 // Size returns the size, in bytes, of the data contained in the Blob object.
 func (b *Blob) Size() int {
-	return b.o.Get("size").Int()
+	return b.Get("size").Int()
 }
 
 // Type returns a string indicating the MIME type of the data contained in
 // the Blob. If the type is unknown, this string is empty.
 func (b *Blob) Type() string {
-	return b.o.Get("type").String()
+	return b.Get("type").String()
 }
 
 // Close closes the blob object, possibly freeing underlying resources.
 func (b *Blob) Close() {
-	b.o.Call("close")
+	b.Call("close")
 }
 
 // Slice returns a new Blob object containing the specified range of bytes of the source Blob.
 func (b *Blob) Slice(start, end int, contenttype string) *Blob {
-	newBlob := b.o.Call("slice", start, end, contenttype)
-	return &Blob{newBlob}
+	newBlob := b.Call("slice", start, end, contenttype)
+	return &Blob{*newBlob}
 }
 
 // Bytes returns a slice of the contents of the Blob.
@@ -66,7 +73,7 @@ func (b *Blob) Bytes() []byte {
 		buf = js.Global.Get("Uint8Array").New( this.Get("result") ).Interface().([]uint8)
 		return nil
 	}))
-	fileReader.Call("readAsArrayBuffer", b.o)
+	fileReader.Call("readAsArrayBuffer", b)
 	wg.Wait()
 	return buf
 }
