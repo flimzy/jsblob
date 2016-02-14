@@ -8,12 +8,12 @@ A js.Object containing an existing Blob can be cast to a Blob object as follows:
     nativeBlob := js.Global.Get("Blob").New([]string{"some blobby data"})
     blob := jsblob.Blob{*nativeBlob}
     fmt.Println( blob.Size() ) // 16
- */
+*/
 package jsblob
 
 import (
-	"sync"
 	"github.com/gopherjs/gopherjs/js"
+	"sync"
 )
 
 // Blob wraps a js.Object
@@ -70,7 +70,7 @@ func (b *Blob) Bytes() []byte {
 	wg.Add(1)
 	fileReader.Set("onload", js.MakeFunc(func(this *js.Object, _ []*js.Object) interface{} {
 		defer wg.Done()
-		buf = js.Global.Get("Uint8Array").New( this.Get("result") ).Interface().([]uint8)
+		buf = js.Global.Get("Uint8Array").New(this.Get("result")).Interface().([]uint8)
 		return nil
 	}))
 	fileReader.Call("readAsArrayBuffer", b)
